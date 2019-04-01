@@ -4,10 +4,10 @@
 #include <map>
 
 /**
- * subscriber class
+ * \brief a subscriber class to register callbacks
  */
 class Publisher{
-    std::map<size_t , std::function<void(const char*, int)>> subs;
+    std::map<size_t, std::function<void(const char *, int)>> subscribers;
 
     // https://stackoverflow.com/questions/18039723/c-trying-to-get-function-address-from-a-stdfunction
     // get address of std::function directing to function callback
@@ -48,7 +48,7 @@ class Publisher{
 
 public:
     /**
-     * \brief call registered subscribers with the given arguments
+     * \brief call all registered subscribers with the given arguments
      */
     void call(const char* arg1, int arg2);
 
@@ -58,23 +58,29 @@ public:
     void clear();
 
     /**
+     * \brief get number of registered subscribers
+     */
+    size_t getSize();
+
+    /**
      * \brief print number of registered subscribers to std::out
      */
     void printSize();
 
     /**
-     * \brief register a new callback
+     * \brief   register a new callback
+     * \return  address of the callback, can be used to unsubscribe
      */
     size_t subscribe (std::function<void(const char*, int)> callback);
 
     /**
-     * deregister a callback using the std::function interface
+     * \brief deregister a callback using the std::function interface
      */
     void unsubscribe(std::function<void(const char*, int)> callback);
 
     /**
-     * deregister a callback using its address
-     * @param address
+     * \brief deregister a callback using its address
+     * \param address was obtained by using using \ref subscribe
      */
     void unsubscribe(size_t address);
 };

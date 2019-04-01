@@ -3,40 +3,44 @@
 #include "CPublisher.h"
 
 void Publisher::call(const char *arg1, int arg2) {
-        for ( auto entry: subs ) { entry.second(arg1, arg2); }
+    for ( auto entry: subscribers ) { entry.second(arg1, arg2); }
 }
 
 void Publisher::clear() {
-        subs.clear();
+    subscribers.clear();
+}
+
+size_t Publisher::getSize() {
+    return subscribers.size();
 }
 
 void Publisher::printSize() {
-        std::cout << "Subscriber size: " << subs.size() << std::endl;
+    std::cout << "Subscriber size: " << subscribers.size() << std::endl;
 }
 
 size_t Publisher::subscribe(std::function<void(const char *, int)> callback) {
-        auto address = getAddress(callback);
+    auto address = getAddress(callback);
 
-        if (address == 0) {
-                // std::function wraps a lambda
-                address = getAddressLambda(callback);
+    if (address == 0) {
+        // std::function wraps a lambda
+        address = getAddressLambda(callback);
+    }
 
-        }
-
-        subs.insert(std::make_pair(address, callback));
-        return address;
+    subscribers.insert(std::make_pair(address, callback));
+    return address;
 }
 
 void Publisher::unsubscribe(std::function<void(const char *, int)> callback) {
-        auto address = getAddress(callback);
-        if (address == 0) {
-                // std::function wraps lambda
-                address = getAddressLambda(callback);
+    auto address = getAddress(callback);
+    if (address == 0) {
+        // std::function wraps lambda
+        address = getAddressLambda(callback);
 
-        }
-        subs.erase(address);
+    }
+    subscribers.erase(address);
 }
 
 void Publisher::unsubscribe(size_t address) {
-        subs.erase(address);
+    subscribers.erase(address);
 }
+
