@@ -19,6 +19,7 @@ auto lambda = [](const char* arg1, int arg2){
 
 // a lambda wrapping a function callback
 auto lambda_func = [](const char *arg1, int arg2) {
+    std::cout << "lambda wrapping function callback: ";
     my_func2(arg1, arg2);
 };
 
@@ -55,14 +56,17 @@ int main() {
     pub.unsubscribe(my_func);
     assert(pub.getSize() == 4);
     pub.unsubscribe(my_func2);
+    assert(pub.getSize() == 3);
     pub.unsubscribe(lambda);
+    // assert(pub.getSize() == 2); // error: will fail, can't unsubscribe with lambda
     pub.unsubscribe(addr3);
-    pub.call("call1", 12);
     assert(pub.getSize() == 2);
+    pub.call("call1", 12);
     pub.printSize();
 
 
     pub.unsubscribe(lambda_capture);
+    // assert(pub.getSize() == 1); // error: will fail, can't unsubscribe with lambda
     pub.unsubscribe(addr4);
     assert(pub.getSize() == 1);
     pub.unsubscribe(func);
