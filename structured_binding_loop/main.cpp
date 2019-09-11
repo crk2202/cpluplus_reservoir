@@ -16,14 +16,22 @@ struct measure {
 };
 
 template<typename KEY, typename VALUE>
-void iterate1(std::unordered_map<KEY, VALUE> &mmap) {
+void iterateStructuredBinding_move(std::unordered_map<KEY, VALUE> &mmap) {
     for ( auto&&[key, val] : mmap ) {
         val.push_back(key);
     }
 }
 
 template<typename KEY, typename VALUE>
-void iterate2(std::unordered_map<KEY, VALUE> &mmap) {
+void iterateStructuredBinding_ref(std::unordered_map<KEY, VALUE> &mmap) {
+    for ( auto& [key, val] : mmap ) {
+        val.push_back(key);
+    }
+}
+
+
+template<typename KEY, typename VALUE>
+void iterateIterator(std::unordered_map<KEY, VALUE> &mmap) {
     for ( typename std::unordered_map<KEY, VALUE>::iterator iter = mmap.begin();
           iter != mmap.end(); iter++ ) {
         iter->second.push_back(iter->first);
@@ -31,44 +39,31 @@ void iterate2(std::unordered_map<KEY, VALUE> &mmap) {
 }
 
 template<typename KEY, typename VALUE>
-void iterate3(std::unordered_map<KEY, VALUE> &mmap) {
+void iterateGenericStructuredBinding_move(std::unordered_map<KEY, VALUE> &mmap) {
     for ( auto&&[key, val] : mmap ) {
-        val.append(key);
-    }
-}
-
-template<typename KEY, typename VALUE>
-void iterate4(std::unordered_map<KEY, VALUE> &mmap) {
-    for ( typename std::unordered_map<KEY, VALUE>::iterator iter = mmap.begin();
-          iter != mmap.end(); iter++ ) {
-        iter->second.append(iter->first);
+        if constexpr (std::is_same<KEY, std::string>::value) {
+            val.append(key);
+        }
+        if constexpr (!std::is_same<KEY, std::string>::value){
+            val.push_back(key);
+        }
     }
 }
 
 int main() {
-    std::unordered_map<int, std::string> map1;
-    std::unordered_map<int, std::string> map2;
-    for ( int i = 0; i < 1000000; i++ ) {
+    std::unordered_map<int, std::string> map1, map2, map3, map4;
+    for ( int i = 0; i < 5000000; i++ ) {
         map1.emplace(i, std::to_string(i));
         map2.emplace(i, std::to_string(i));
+        map3.emplace(i, std::to_string(i));
+        map4.emplace(i, std::to_string(i));
     }
 
 
-    std::cout << measure<>::execution(iterate1<int, std::string>, map1) << std::endl;
-    std::cout << measure<>::execution(iterate2<int, std::string>, map2) << std::endl;
+    std::cout << "iterateIterator<int, std::string> " << measure<>::execution(iterateIterator<int, std::string>, map1) << std::endl;
+    std::cout << "iterateStructuredBinding_ref<int, std::string> " << measure<>::execution(iterateStructuredBinding_ref<int, std::string>, map2) << std::endl;
+    std::cout << "iterateStructuredBinding_move<int, std::string> " << measure<>::execution(iterateStructuredBinding_move<int, std::string>, map3) << std::endl;
+    std::cout << "iterateGenericStructuredBinding_move<int, std::string>" << measure<>::execution(iterateGenericStructuredBinding_move<int, std::string>, map4) << std::endl;
 
-
-    std::unordered_map<std::string, std::string> map3;
-    std::unordered_map<std::string, std::string> map4;
-    for ( int i = 0; i < 1000000; i++ ) {
-        auto r = std::rand();
-        map3.emplace(std::to_string(r), std::to_string(i));
-        map4.emplace(std::to_string(r), std::to_string(i));
-    }
-
-    std::cout << measure<>::execution(iterate3<std::string, std::string>, map3) << std::endl;
-    std::cout << measure<>::execution(iterate4<std::string, std::string>, map4) << std::endl;
-
-    std::cout << "Hello, World!" << std::endl;
     return 0;
 }

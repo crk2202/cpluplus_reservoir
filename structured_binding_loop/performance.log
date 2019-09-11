@@ -1,0 +1,7 @@
+/home/reimund/programming/cpluplus_reservoir/structured_binding_loop/cmake-build-debug/hashmap
+iterateIterator<int, std::string> 523197
+iterateStructuredBinding_ref<int, std::string> 472249
+iterateStructuredBinding_move<int, std::string> 474238
+iterateGenericStructuredBinding_move<int, std::string>468169
+
+Process finished with exit code 0
